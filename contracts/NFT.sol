@@ -6,6 +6,7 @@ import "erc721a/contracts/ERC721A.sol";
 
 contract NFT is ERC721A, Ownable {
     // TODO: ADD COMMENTS
+    // TODO: change names (contract and tokens)
     uint public immutable maxSupply;
     string public baseURI;
     string public contractURI;
@@ -32,12 +33,12 @@ contract NFT is ERC721A, Ownable {
         contractURI = _contractURI;
     }
 
-    function setBaseURI(string calldata _newBaseURI) public onlyOwner{
+    function setBaseURI(string calldata _newBaseURI) public onlyOwner {
         baseURI = _newBaseURI;
         emit BaseURIChanged(msg.sender, _newBaseURI);
     }
 
-    function setContractURI(string calldata _newContractURI) public onlyOwner{
+    function setContractURI(string calldata _newContractURI) public onlyOwner {
         contractURI = _newContractURI;
         emit ContractURIChanged(msg.sender, _newContractURI);
     }
@@ -45,11 +46,29 @@ contract NFT is ERC721A, Ownable {
     function airdrop(address[] calldata _recipients) external payable onlyOwner {
         // `_mint`'s second argument now takes in a `quantity`, not a `tokenId`.
         require(totalSupply() + _recipients.length <= maxSupply, "Max supply reached");
-        for (uint i=0; i<_recipients.length; i++) {
+        for (uint i = 0; i < _recipients.length; i++) {
             address to = _recipients[i];
             require(to != address(0), "Can't mint to zero address");
             _safeMint(to, 1);
             emit Airdropped(to, msg.sender, 1);
         }
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseURI;
+    }
+
+    function tokenURI(uint256 tokenId)
+    public
+    view
+    virtual
+    override
+    returns (string memory)
+    {
+        string memory uri = super.tokenURI(tokenId);
+        return
+        bytes(uri).length > 0
+        ? string(abi.encodePacked(uri, ".json"))
+        : "";
     }
 }
