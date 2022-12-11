@@ -1,5 +1,5 @@
-const {expect} = require("chai");
-const {ethers} = require("hardhat")
+const { expect } = require("chai");
+const { ethers } = require("hardhat")
 
 const recipients = require("../scripts/airdrop_recipients.json")
 
@@ -28,14 +28,28 @@ describe("NFT contract", function () {
 
 
     describe("Airdrop", function () {
+
         it("Should transfer tokens to recipients", async function () {
-            let txn = await nft.airdrop(recipients);
+            await nftContract.connect(owner).airdrop(recipients);
+
+            for (let i = 0; i < 3; i++) {
+                let tokenHolder = await nftContract.getOwnershipData(i);
+                expect(await tokenHolder[0]).to.equal(recipients[i]);
+            }
         });
-        it('should revert if non-owner tries to airdrop', function () {
+
+        it('should revert if non-owner tries to airdrop', async function () {
+            await expect(nftContract.connect(non_owner).airdrop(recipients)).to.be.revertedWith("Ownable: caller is not the owner");
         });
-        it('should revert if the number of recipients is greater than the maxSupply', function () {
+
+        it('should revert if the number of recipients is greater than the maxSupply', async function () {
+            let newRecipients = Array(4).fill(owner.address);
+            await expect(nftContract.connect(owner).airdrop(newRecipients)).to.be.revertedWith("Max supply reached");
         });
-        it('should revert if one of the recipients is a zero address', function () {
+
+        it('should revert if one of the recipients is a zero address', async function () {
+            let newRecipients = [ethers.constants.AddressZero];
+            await expect(nftContract.connect(owner).airdrop(newRecipients)).to.be.revertedWith("Can't mint to zero address");
         });
 
     });
