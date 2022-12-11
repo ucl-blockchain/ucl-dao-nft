@@ -71,4 +71,12 @@ contract NFT is ERC721A, Ownable {
         ? string(abi.encodePacked(uri, ".json"))
         : "";
     }
+
+    function getOwnershipData(uint256 tokenId)
+    external
+    view
+    returns (TokenOwnership memory)
+    {
+        return _ownershipOf(tokenId);
+    }
 }
