@@ -34,7 +34,7 @@ describe("NFT contract", function () {
 
             for (let i = 0; i < 3; i++) {
                 let tokenHolder = await nftContract.getOwnershipData(i);
-                expect(await tokenHolder[0]).to.equal(recipients[i]);
+                expect(tokenHolder[0]).to.equal(recipients[i]);
             }
         });
 
@@ -43,7 +43,7 @@ describe("NFT contract", function () {
         });
 
         it('should revert if the number of recipients is greater than the maxSupply', async function () {
-            let newRecipients = Array(4).fill(owner.address);
+            let newRecipients = Array(maxSuppply + 1).fill(owner.address);
             await expect(nftContract.connect(owner).airdrop(newRecipients)).to.be.revertedWith("Max supply reached");
         });
 
@@ -57,24 +57,24 @@ describe("NFT contract", function () {
     describe("Setting Values", function () {
 
         it("Should update contractURI", async function () {
-            let newContractURI = "hello world - contractURI";
+            let newContractURI = "new contractURI";
             await nftContract.connect(owner).setContractURI(newContractURI);
             await expect(await nftContract.contractURI()).to.equal(newContractURI);
         });
 
         it("Should revert if non-owner tries to update contractURI", async function () {
-            let newContractURI = "hello world - contractURI";
+            let newContractURI = "new contractURI";
             await expect(nftContract.connect(non_owner).setContractURI(newContractURI)).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("Should update baseURI", async function () {
-            let newBaseURI = "hello world - baseURI";
+            let newBaseURI = "new baseURI";
             await nftContract.connect(owner).setBaseURI(newBaseURI);
             await expect(await nftContract.baseURI()).to.equal(newBaseURI);
         });
 
         it("Should revert if non-owner tries to update baseURI", async function () {
-            let newBaseURI = "hello world - baseURI";
+            let newBaseURI = "new baseURI";
             await expect(nftContract.connect(non_owner).setBaseURI(newBaseURI)).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
